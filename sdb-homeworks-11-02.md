@@ -9,3 +9,6 @@
 ---
 ### Задание 3. Удаление по TTL в Memcached
 ![data](https://github.com/BeastieBoy93/sdb-homeworks/blob/sdbsql-24/mem-data.png)
+---
+### Задание 4. Запись данных в Redis
+![redis-data](https://github.com/BeastieBoy93/sdb-homeworks/blob/sdbsql-24/redis-data.png)
