@@ -16,7 +16,7 @@ SELECT * FROM payment p
 WHERE payment_date >= '2005-06-15' AND payment_date < '2005-06-19'
 AND amount > 10.00;
 ```
-![Задание 2]()
+![Задание 2](https://github.com/BeastieBoy93/sdb-homeworks/blob/sdbsql-24/SQL_2.png)
 
 ---
 ### Задание 3
