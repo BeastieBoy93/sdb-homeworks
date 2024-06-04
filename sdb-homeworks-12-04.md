@@ -22,36 +22,11 @@ WHERE `length` > (SELECT AVG(`length`) FROM film f2);
 ---
 ### Задание 3
 ```
-SELECT 
-    most_profit.`month`, 
-    most_profit.paym_sum, 
-    rental_counts.rental_count
-FROM (
-    SELECT `month`, paym_sum
-    FROM (
-        SELECT MONTH(payment_date) AS `month`, SUM(amount) AS paym_sum
-        FROM payment
-        GROUP BY MONTH(payment_date)
-    ) AS most_profit
-    WHERE paym_sum = (
-        SELECT MAX(paym_sum)
-        FROM (
-            SELECT MONTH(payment_date) AS `month`, SUM(amount) AS paym_sum
-            FROM payment
-            GROUP BY MONTH(payment_date)
-        ) AS max_paym_sum
-    )
-) AS most_profit
-LEFT JOIN (
-    SELECT r_month, COUNT(r_month) AS rental_count
-    FROM (
-        SELECT MONTH(rental_date) AS r_month, inventory_id
-        FROM rental
-        GROUP BY inventory_id, r_month
-    ) AS r_cnt
-    GROUP BY r_month
-) AS rental_counts
-ON most_profit.`month` = rental_counts.r_month;
+SELECT YEAR(payment_date) as `year`, MONTH(payment_date) AS `month`, SUM(amount) AS paym_sum, COUNT(rental_id) as rental_cnt 
+FROM payment
+GROUP BY YEAR(payment_date), MONTH(payment_date)
+ORDER BY paym_sum DESC
+LIMIT 1;
 ```
 ![Задание 3](https://github.com/BeastieBoy93/sdb-homeworks/blob/sdbsql-24/SQL4_3.png)
 
