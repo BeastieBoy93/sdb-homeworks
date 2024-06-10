@@ -10,8 +10,8 @@ WHERE TABLE_SCHEMA = 'sakila';
 
 ---
 ### Задание 2
-`
 Результат Explain analyze:
+```
 -> Limit: 200 row(s)  (cost=0..0 rows=0) (actual time=6885..6885 rows=200 loops=1)
     -> Table scan on <temporary>  (cost=2.5..2.5 rows=0) (actual time=6885..6885 rows=200 loops=1)
         -> Temporary table with deduplication  (cost=0..0 rows=0) (actual time=6885..6885 rows=391 loops=1)
@@ -29,20 +29,21 @@ WHERE TABLE_SCHEMA = 'sakila';
                                     -> Covering index lookup on r using rental_date (rental_date=p.payment_date)  (cost=0.969 rows=1.04) (actual time=0.00123..0.00178 rows=1.01 loops=634000)
                                 -> Single-row index lookup on c using PRIMARY (customer_id=r.customer_id)  (cost=250e-6 rows=1) (actual time=164e-6..190e-6 rows=1 loops=642000)
                             -> Single-row covering index lookup on i using PRIMARY (inventory_id=r.inventory_id)  (cost=250e-6 rows=1) (actual time=144e-6..169e-6 rows=1 loops=642000)
-Общее время выполнения запроса: 7.258s`
+```
+Общее время выполнения запроса: 7.258s
 ![Задание 2.1](https://github.com/BeastieBoy93/sdb-homeworks/blob/sdbsql-24/SQL5_2.png)
-`Исходя из анализа дедупликация с distinct, окнная функция over, не явно прописанные джоины, фильтрация с функцией date занимают много времени.
-Предложение по ускорению выборки:`
+Исходя из анализа дедупликация с distinct, окнная функция over, не явно прописанные джоины, фильтрация с функцией date занимают много времени.
+Предложение по ускорению выборки:
 1. исполльзование группировки по customer_name и customer_id вместо distict и оконной функции over
 2. явно прописанные джоины, а также 
 3. фильтрация по столбцу p.payment_date с указанием конечной даты без функции date
 4. дополнительной индексация в таблице payment по payment_date
 
-`Индекс создавался командой:`
+Индекс создавался командой:
 ```
 CREATE INDEX idx_payment_date ON payment(payment_date);
 ```
-`Итоговый запрос:`
+Итоговый запрос:
 ```
 select concat(c.last_name, ' ', c.first_name) as customer_name, sum(p.amount) as total_amount
 from payment p
@@ -53,7 +54,7 @@ join film f on i.film_id = f.film_id
 where p.payment_date >= '2005-07-30 00:00:00' and p.payment_date < '2005-07-31 00:00:00'
 group by c.customer_id, customer_name;
 ```
-`
+```
 Результат Explain analyze после совершения всех манипуляций:
 -> Limit: 200 row(s)  (actual time=5.53..5.56 rows=200 loops=1)
     -> Table scan on <temporary>  (actual time=5.53..5.55 rows=200 loops=1)
@@ -69,7 +70,7 @@ group by c.customer_id, customer_name;
                     -> Single-row index lookup on i using PRIMARY (inventory_id=r.inventory_id)  (cost=0.246 rows=1) (actual time=934e-6..953e-6 rows=1 loops=642)
                 -> Single-row covering index lookup on f using PRIMARY (film_id=i.film_id)  (cost=0.246 rows=1) (actual time=924e-6..944e-6 rows=1 loops=642)
 Общее время выполнения запроса: 10ms
-`
+```
 ![Задание 2.2](https://github.com/BeastieBoy93/sdb-homeworks/blob/sdbsql-24/SQL5_3.png)
 
 ---
